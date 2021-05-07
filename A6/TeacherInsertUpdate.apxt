@@ -1,0 +1,6 @@
+trigger TeacherInsertUpdate on Contact (before insert,before update) {
+	for (Teach__c a : [SELECT Teacher__r.Id FROM Teach__c WHERE Teacher__r.Id in: Trigger.new and Subject__c includes ('Hindi')]) {
+        Trigger.newMap.get(a.Teacher__r.Id).addError(
+            'Cannot update/insert Teacher with subject Hindi.');
+    }
+}

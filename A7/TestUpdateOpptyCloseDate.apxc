@@ -1,0 +1,35 @@
+@isTest
+public class TestUpdateOpptyCloseDate {
+	
+    @isTest static void setup(){
+        List<Opportunity> opptys = new List<Opportunity>();
+        
+        for(Integer i=0;i<5;i++){
+            Opportunity opp = new Opportunity(Name='test'+1,CloseDate=Date.newInstance(2021, 10, i+1),StageName='Prospecting');
+            opptys.add(opp);
+        }
+        
+        insert opptys;
+    }
+    
+    @isTest static void testCloseDate(){
+        List<Opportunity> opptys = [SELECT Name,StageName FROM Opportunity WHERE Name Like 'test%'];
+        for(Integer i=0;i<opptys.size();i++){
+            if(math.mod(i, 2) == 0)
+                opptys[i].StageName = 'Closed Won';
+            else
+                opptys[i].StageName = 'Closed Lost';
+        }
+        
+        Test.startTest();
+        update opptys;
+        Test.stopTest();
+        
+		List<Opportunity> opptysAfterUpdation = [SELECT Name,CloseDate,StageName FROM Opportunity WHERE Name Like 'test%']; 
+        
+        for(Integer i=0;i<opptysAfterUpdation.size();i++){
+            System.assertEquals(Date.today(), opptysAfterUpdation[i].CloseDate);
+        }
+    }
+    
+}

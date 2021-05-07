@@ -1,0 +1,26 @@
+trigger UpdateClassStudents on Class__c (after update) {
+
+    List<Id> resetClassIds = new List<Id>();
+    
+    for(Class__c c: Trigger.new){
+        System.debug(c.Custom_Status__c);
+        if(c.Custom_Status__c == 'Reset'){
+            resetClassIds.add(c.Id);
+        }
+    }
+    
+    List<Class__c> classes = [SELECT Id,(SELECT Id FROM Students__r) FROM Class__c WHERE Id in: resetClassIds];
+    
+    List<Student__c> studentsToDelete = new List<Student__c>();
+    
+    for(Integer i=0;i<classes.size();i++){
+
+        studentsToDelete.addAll(classes[i].Students__r);
+    }
+    
+
+    
+    if(studentsToDelete.size() > 0)
+        delete studentsToDelete;
+
+}

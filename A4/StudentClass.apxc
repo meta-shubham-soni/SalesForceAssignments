@@ -1,0 +1,49 @@
+public class StudentClass {
+    public static List<Student__c> fetchStudents(Id classID){
+        if(classID == null)
+            return null;
+        List<Id> ids = new List<Id>();
+        ids.add(classID);
+        List<Class__c> reqClass = [SELECT (SELECT First_Name__c FROM Students__r) 
+                             		FROM Class__c WHERE Id IN : ids]; 
+        List<Student__c> studList = reqClass[0].Students__r;
+		System.debug(studList.size());
+        return studList;
+    }
+    
+    public static Map<Class__c,Set<Id>> fetchClassAndStudents(){
+        List<Class__c> Classes = [SELECT (SELECT First_Name__c FROM Students__r) 
+                             		FROM Class__c ];
+        Map<Class__c,Set<Id>> retValue = new Map<Class__c,Set<Id>>();
+        for(Integer i=0;i<Classes.size();i++){
+            Set<Id> StudIds = new Set<Id>();
+            for(Integer j=0;j<Classes[i].Students__r.size();j++){
+                StudIds.add(Classes[i].Students__r[j].Id);
+            }
+            System.debug(StudIds.size());
+            retValue.put(Classes[i],StudIds);
+        }
+        return retValue;
+    }
+    
+    public static Integer findNoOfWorkingDays(DateTime startDate,DateTime endDate){
+		Integer workingDays = 0;
+        startDate = startDate.addDays(1);
+        
+        while(startDate < endDate){
+            if(startDate.format('E') != 'Sat' && startDate.format('E') != 'Sun')
+                workingDays++;
+            startDate = startDate.addDays(1);
+        }       
+        return workingDays;
+    } 
+    
+    public static void showAllSObjects(){
+        for ( Schema.SObjectType o : Schema.getGlobalDescribe().values() ){
+            Schema.DescribeSObjectResult objResult = o.getDescribe();
+            system.debug( 'Sobject API Name: ' + objResult.getName() );
+            system.debug( 'Sobject Label Name: ' + objResult.getLabel() );   
+        }
+    }
+    
+}

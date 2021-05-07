@@ -1,0 +1,10 @@
+trigger ClassDeletion on Class__c (before delete) {
+	
+	for (Class__c a : [SELECT Id,(SELECT Name FROM Students__r WHERE Sex__c = 'Female' ) FROM Class__c WHERE Id in:Trigger.old]) {
+        if(a.Students__r.size() > 1){
+        Trigger.oldMap.get(a.Id).addError(
+            'Cannot delete Class with Female Students more than 1.');
+        }
+    }
+    
+}

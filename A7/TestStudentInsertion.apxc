@@ -1,0 +1,40 @@
+@isTest
+public class TestStudentInsertion {
+	
+    @isTest static void testInsertion(){
+        List<Class__c> classes = new List<Class__c>();
+        List<Student__c> students = new List<Student__c>();
+
+        for(Integer i=0;i<2;i++){
+            Class__c cl = new Class__c(Name='test'+i,MaxSize__c=5);
+            classes.add(cl);
+        }
+		insert classes;
+        for(Integer i=0;i<12;i++){
+			String gender = math.mod(i,2) == 0 ? 'Female':'Male';
+            Student__c stud = new Student__c(First_Name__c='test',Last_Name__c='stud'+i,
+                                             Sex__c=gender,Married__c='No');
+            if(math.mod(i,2) == 0){
+                stud.Class__c = classes[math.mod(i,2)].Id;
+            }
+            else{
+                stud.Class__c = classes[math.mod(i,2)].Id;
+            }
+			students.add(stud);            
+        }
+        
+        Test.startTest();
+        Database.SaveResult[] results = Database.insert(students, false);
+        
+        Test.stopTest();
+        
+        for(Integer i=0;i<results.size();i++){
+            if(i != 10 && i != 11)
+                System.assertEquals(true, results[i].isSuccess());
+            else
+                System.assertEquals(false, results[i].isSuccess());
+        }
+
+    }
+    
+}

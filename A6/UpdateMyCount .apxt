@@ -1,0 +1,52 @@
+trigger UpdateMyCount on Student__c (before insert,before delete) {
+    
+    if(Trigger.isInsert){
+        Map<Id,Integer> classesId = new Map<Id,Integer>();
+        List<Class__c> classesToUpdate = new List<Class__c>();
+        for(Student__c stud : Trigger.new){
+            if(classesId.containsKey(stud.Class__c)){
+                Integer oldvalue = classesId.get(stud.Class__c);
+                classesId.put(stud.Class__c,oldvalue+1);
+            }
+            else{
+                classesId.put(stud.Class__c,1);
+            }
+        }
+        System.debug(classesId.size()+'id');
+        
+        classesToUpdate = [SELECT MyCount__c FROM Class__c WHERE Id in :classesId.keySet()];
+        System.debug(classesToUpdate.size()+'idd');
+        
+        for(Class__c c:classesToUpdate){
+            
+            c.MyCount__c = c.MyCount__c + classesId.get(c.Id);
+            System.debug(c.MyCount__c);
+        }       
+        
+        update classesToUpdate;
+    }
+    else if(Trigger.isDelete){
+        Map<Id,Integer> classesId = new Map<Id,Integer>();
+        List<Class__c> classesToUpdate = new List<Class__c>();
+        for(Student__c stud : Trigger.old){
+            if(classesId.containsKey(stud.Class__c)){
+                Integer oldvalue = classesId.get(stud.Class__c);
+                classesId.put(stud.Class__c,oldvalue+1);
+            }
+            else{
+                classesId.put(stud.Class__c,1);
+            }
+        }
+        System.debug(classesId.size());
+        
+        classesToUpdate = [SELECT MyCount__c FROM Class__c WHERE Id in :classesId.keySet()];
+        System.debug(classesToUpdate.size());
+        
+        for(Class__c c:classesToUpdate){
+            System.debug(c.MyCount__c);
+            c.MyCount__c = c.MyCount__c - classesId.get(c.Id);
+        }       
+        
+        update classesToUpdate;
+    }
+}

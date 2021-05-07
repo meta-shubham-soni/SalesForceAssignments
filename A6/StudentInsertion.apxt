@@ -1,0 +1,28 @@
+trigger StudentInsertion on Student__c (before insert) {
+    Map<Id,List<Student__c>> classesStudentsId = new Map<Id,List<Student__c>>();
+    List<Class__c> classesToCheck = new List<Class__c>();
+    for(Student__c stud : Trigger.new){
+        List<Student__c> tempList = new List<Student__c>();
+        if(classesStudentsId.containsKey(stud.Class__c)){
+            tempList = classesStudentsId.get(stud.Class__c);
+            tempList.add(stud);
+            classesStudentsId.put(stud.Class__c,tempList);
+        }
+        else{
+            tempList.add(stud);
+            classesStudentsId.put(stud.Class__c, tempList);
+        }
+    }
+        
+    classesToCheck = [SELECT NumberOfStudents__c,MaxSize__c FROM Class__c WHERE Id in :classesStudentsId.keySet()];
+    
+    for (Class__c a : classesToCheck) {
+        if(a.NumberOfStudents__c + classesStudentsId.get(a.Id).size() > a.MaxSize__c){
+            Integer allowedStudents = (Integer)(a.MaxSize__c - a.NumberOfStudents__c);
+            for(Integer i= classesStudentsId.get(a.Id).size()-1;i >= allowedStudents ; i--){
+                classesStudentsId.get(a.Id)[i].addError('Class Full');
+            }
+        }
+    }
+
+}

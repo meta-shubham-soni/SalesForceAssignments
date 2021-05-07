@@ -1,0 +1,45 @@
+1.
+SELECT First_Name__c , Last_Name__c , DOB__c , Sex__c FROM Student__c 
+WHERE Last_Name__c LIKE 'S%' 
+
+2.
+SELECT First_Name__c , Last_Name__c , DOB__c , Sex__c FROM Student__c 
+WHERE Class__r.Name LIKE 'X%' 
+
+3.
+SELECT First_Name__c , Last_Name__c , Class__r.Name  FROM Student__c 
+
+4.
+SELECT Name, (SELECT Name FROM Students__r) FROM Class__c
+
+5.
+SELECT (Select First_Name__c from Students__r), Name FROM Class__c
+WHERE ClassTeacher__r.Name LIKE 'S%
+
+6.
+SELECT First_Name__c,Last_Name__c FROM Student__c 
+WHERE CALENDAR_YEAR(DOB__c) > 2000
+
+7.
+SELECT Id, Name, CreatedDate 
+FROM Lead 
+WHERE CreatedDate >THIS_MONTH 
+AND SystemModstamp >THIS_MONTH
+
+8.
+SELECT (Select First_Name__c from Students__r WHERE First_Name__c LIKE 'S%' ), Name FROM Class__c
+
+9.
+SELECT Teacher__r.Name, Subject__c FROM Teach__c 
+WHERE Subject__c includes ('Hindi;English')
+
+10.
+SELECT First_Name__c, Last_Name__c FROM Student__c 
+WHERE Class__c IN (SELECT Class__c FROM Teach__c WHERE Subject__c includes ('English','Hindi'))
+
+11.
+SELECT NumberOfStudents__c, Name FROM Class__c
+
+12.
+SELECT COUNT(Name), CALENDAR_MONTH(DOB__c) FROM Student__c 
+GROUP BY CALENDAR_MONTH(DOB__c)

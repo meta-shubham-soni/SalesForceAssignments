@@ -1,0 +1,34 @@
+public class AccountContact {
+	@future
+    public static void addContactId(Id accId,Id conId){
+		if(accId == null)
+            return;
+        List<Account> reqAccount = [SELECT ContactIDs__c,
+                                (SELECT Id FROM Contacts) FROM Account
+                               WHERE Id =: accId];
+    	String conIds = reqAccount[0].contactIDs__c;
+        
+        if(conIds == null){
+            conIds = '';
+            for(Integer i=0;i<reqAccount[0].Contacts.size();i++){
+                conIds += reqAccount[0].Contacts[i].Id;
+                if(i != reqAccount[0].Contacts.size()-1)
+                    conIds += ',';
+            }
+            reqAccount[0].contactIDs__c = conIds;
+            update reqAccount;
+        }
+        else{
+            List<String> conIdsList = conIds.split(',');
+            
+            for(Integer i=0;i<conIdsList.size();i++){
+                if(conId.equals(conIdsList[i]))
+                	return;    
+            }
+            
+            conIds += ','+conId;
+            reqAccount[0].contactIDs__c = conIds;
+            update reqAccount;
+        }
+    }
+}

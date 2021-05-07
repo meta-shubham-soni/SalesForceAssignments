@@ -1,0 +1,44 @@
+@isTest
+public class TestClassDeletion {
+    @isTest static void setup(){
+        List<Class__c> classes = new List<Class__c>();
+        List<Student__c> students = new List<Student__c>();
+
+        for(Integer i=0;i<5;i++){
+            Class__c cl = new Class__c(Name='test'+i,MaxSize__c=10);
+            classes.add(cl);
+        }
+		insert classes;
+        for(Integer i=0;i<10;i++){
+			String gender = math.mod(i,2) == 0 ? 'Female':'Male';
+            Student__c stud = new Student__c(First_Name__c='test',Last_Name__c='stud'+i,
+                                             Sex__c=gender,Married__c='No');
+            if(math.mod(i,2) == 0){
+                stud.Class__c = classes[math.mod(i,5)].Id;
+            }
+            else{
+                stud.Class__c = classes[math.mod(i,5)].Id;
+            }
+            System.debug(stud.Class__r.Id);
+			students.add(stud);            
+        }        
+        
+        insert students;
+    }
+    @isTest static void testClassDeleteWithFemale(){
+        List<Class__c> classes = [SELECT Id,(SELECT Name FROM Students__r WHERE Sex__c = 'Female' ) FROM Class__c WHERE Name Like 'test%'];
+        List<Class__c> classesWithMoreThanOneFemale = new List<Class__c>();
+        for(Class__c cl : classes){
+            if(cl.Students__r.size() > 1)
+                classesWithMoreThanOneFemale.add(cl);
+        }
+        
+        Test.startTest();
+        
+        Database.DeleteResult[] res = Database.delete(classesWithMoreThanOneFemale, false);
+        
+        Test.stopTest();
+        for(Database.DeleteResult dr :res)
+        	System.assertEquals(false, dr.isSuccess());
+    }
+}

@@ -1,0 +1,5 @@
+1.
+FIND {Shubham} RETURNING Student__c(Name),contact(Name)
+
+2.
+FIND {Shubham} RETURNING Student__C(Name, Sex__c WHERE Sex__c='Male'),contact(Name)

@@ -1,0 +1,24 @@
+public class RemindOpptyOwners implements Schedulable {
+	public void execute(SchedulableContext ctx) {
+        Datetime temp = System.now().addDays(-30);
+        List<Opportunity> opptys = [SELECT Id, Name, OwnerId, CloseDate
+            FROM Opportunity
+            WHERE LastModifiedDate < : temp];
+        // Create a task for each opportunity in the list
+        createTaskforOpp(opptys);
+    }
+    public static void createTaskforOpp(List<Opportunity> oppList) {
+        List<Task> taskList = new List<Task>();
+        For(Opportunity opp : oppList) {
+          Task newTask = new Task(
+               WhatId = opp.Id,
+               OwnerId = opp.OwnerId,
+               ActivityDate = Date.today(),
+               Subject = 'Update Opportunity',
+               Description = 'Check These Opportunity');
+            taskList.add(newTask);
+        }
+        insert taskList;
+    }
+
+}

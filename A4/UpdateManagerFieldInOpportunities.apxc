@@ -1,0 +1,29 @@
+public class UpdateManagerFieldInOpportunities {
+   
+    public static void updateManager(List<Opportunity> opportunities){
+        Map<Id,Id> contactAccountMap= new Map<Id,Id>(); //MAP OF CONTACT ID AND ACCOUNT ID
+        //PUT ALL CONTACT ID WITH ACCOUNT ID AS NULL 
+        for(Opportunity opportunity:opportunities){
+            if(opportunity.BillToContact__c != null){
+                contactAccountMap.put(opportunity.BillToContact__c, null);
+            }
+        }
+        List<Contact> contacts=[SELECT Id,AccountId FROM Contact WHERE id IN:contactAccountMap.keySet()];//GET ALL CONTACT ID AND ACCOUNT ID
+        //PUT ACCOUNT ID CORRESPONDING TO ITS CONTACT ID
+        for(Contact con:contacts){
+            contactAccountMap.put(con.Id,con.AccountId);
+        }
+        
+        for(Opportunity opportunity:opportunities){
+            if(opportunity.BillToContact__c != null && opportunity.Manager__c == null && 
+               contactAccountMap.containsKey(opportunity.BillToContact__c) && contactAccountMap.get(opportunity.BillToContact__c)!=null){
+                   opportunity.Manager__c=contactAccountMap.get(opportunity.BillToContact__c);
+               }
+        }
+    }
+}
+
+
+trigger UpdateManagerFieldInOpportunities on Opportunity (before update) {
+    UpdateManagerFieldInOpportunities.updateManager(Trigger.New);
+}

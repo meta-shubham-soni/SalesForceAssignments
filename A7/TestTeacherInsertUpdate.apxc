@@ -1,0 +1,35 @@
+@isTest
+public class TestTeacherInsertUpdate {
+    
+    @isTest static void testTeacherInsertUpdate(){
+        Contact teacher1 = new Contact(FirstName='Shubham',LastName='Soni',Field_Experience__c=3);
+        Contact teacher2 = new Contact(FirstName='Rahul',LastName='Soni',Field_Experience__c=4);
+        
+        Class__c class1 = new Class__c(Name='1');
+        Teach__c teach1 = new Teach__c(Subject__c='English;Hindi');
+		Teach__c teach2 = new Teach__c(Subject__c='English;Maths');
+    	    	
+		Test.startTest();
+        insert teacher1;
+        insert teacher2;
+        insert class1;
+        teach1.Class__c = class1.Id;
+        teach1.Teacher__c = teacher1.Id;
+		teach2.Class__c = class1.Id;
+        teach2.Teacher__c = teacher2.Id;
+        insert teach1;
+        insert teach2;
+
+        
+        teacher1.Email = 'abc@gmail.com';
+        teacher2.Email = 'abcd@gmail.com';
+        
+        Database.SaveResult res = Database.update(teacher1,false);
+		Database.SaveResult res2 = Database.update(teacher2,false);
+                
+        Test.stopTest();
+        System.assertEquals(false, res.isSuccess());
+        System.assertEquals(true, res2.isSuccess());
+        
+    }
+}

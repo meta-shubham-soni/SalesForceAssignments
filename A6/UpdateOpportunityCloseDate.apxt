@@ -1,0 +1,11 @@
+trigger UpdateOpportunityCloseDate on Opportunity (after update) {
+    if(CheckRecursion.runOnce()){
+        List<Opportunity> opptyToUpdate = [SELECT Id,CloseDate FROM Opportunity WHERE Id in:Trigger.New and (StageName = 'Closed Won' or StageName = 'Closed Lost') ];
+        
+        for(Opportunity o:opptyToUpdate){
+            o.closeDate = Date.today();
+        }
+        
+        update opptyToUpdate;
+    }
+}
